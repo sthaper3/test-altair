@@ -45,13 +45,17 @@ bar_chart = (
     alt.Chart(filtered)
     .mark_bar()
     .encode(
-    x=alt.X('neighbourhood:N', sort='-y',
-            axis=alt.Axis(title='Neighborhood')),
-    y=alt.Y('count():Q',
-            axis=alt.Axis(title='Number of Listings')),
-    color=alt.condition(neigh_select, 'neighbourhood:N', alt.value('lightgray')),
-    tooltip=['neighbourhood', 'count()']
-)
+        x=alt.X('neighbourhood:N', sort='-y',
+                axis=alt.Axis(title='Neighborhood')),
+        y=alt.Y('count():Q',
+                axis=alt.Axis(title='Number of Listings')),
+        color=alt.condition(
+            neigh_select,
+            alt.Color('neighbourhood:N', scale=alt.Scale(scheme='category20')),
+            alt.value('lightgray')
+        ),
+        tooltip=['neighbourhood', 'count()']
+    )
     .add_selection(neigh_select)
     .properties(width=700, height=300, title="Number of Listings by Neighborhood")
 )
