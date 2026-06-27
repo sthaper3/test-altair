@@ -20,7 +20,7 @@ price_range = st.sidebar.slider("Price Range", min_price, max_price, (min_price,
 price_scatter_df = df.copy()
 if selected_neigh != "All":
     price_scatter_df = price_scatter_df[price_scatter_df['neighbourhood'] == selected_neigh]
- price_scatter_df = price_scatter_df[
+price_scatter_df = price_scatter_df[
     (price_scatter_df['price'] >= price_range[0]) &
     (price_scatter_df['price'] <= price_range[1])
 ]
