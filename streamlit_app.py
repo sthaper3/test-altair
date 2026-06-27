@@ -50,10 +50,11 @@ bar_chart = (
         y=alt.Y('count():Q',
                 axis=alt.Axis(title='Number of Listings')),
         color=alt.condition(
-            neigh_select,
-            alt.Color('neighbourhood:N', scale=alt.Scale(scheme='category20')),
-            alt.value('lightgray')
-        ),
+    neigh_select,
+    alt.Color('neighbourhood:N', scale=alt.Scale(scheme='tableau20')),
+    alt.value('lightgray')
+)
+
         tooltip=['neighbourhood', 'count()']
     )
     .add_selection(neigh_select)
