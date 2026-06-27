@@ -35,7 +35,7 @@ scatter_df = scatter_df[
 # -----------------------------
 # SELECTION FOR BAR → BOXPLOT
 # -----------------------------
-bar_select = alt.selection_single(fields=['neighbourhood'], empty='none')
+bar_select = alt.selection_single(fields=['neighbourhood'], empty='all')
 
 # -----------------------------
 # 1. BAR CHART: Listings by Neighborhood
