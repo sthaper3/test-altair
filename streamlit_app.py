@@ -52,18 +52,14 @@ scatter = (
     alt.Chart(df)
     .mark_circle(size=120, opacity=0.6)
     .encode(
-        x=alt.X(
-            'number_of_reviews:Q',
-            scale=alt.Scale(
-                domain=[0, df['number_of_reviews'].quantile(0.95)]
-            )
-        ),
+        x='number_of_reviews:Q',
         y='price:Q',
         color='room_type:N',
         tooltip=['name', 'neighbourhood', 'price', 'number_of_reviews']
     )
     .properties(width=900, height=600, title="Price vs Number of Reviews")
 )
+
 
 
 
