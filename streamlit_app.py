@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 
-st.title("Basic Newark Airbnb Dashboard (With Filters + Bar→Scatter Interaction)")
+st.title("Airbnb Listings in Newark, NJ")
 
 df = pd.read_csv("listings.csv")
 
