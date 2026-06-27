@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 
-st.title("Basic Newark Airbnb Dashboard (With Filters + Bar→Scatter Interaction)")
+st.title("AirBnb Listings in Newark, NJ")
 
 df = pd.read_csv("listings.csv")
 
@@ -45,11 +45,14 @@ bar_chart = (
     alt.Chart(filtered)
     .mark_bar()
     .encode(
-        x=alt.X('neighbourhood:N', sort='-y'),
-        y='count():Q',
-        color=alt.condition(neigh_select, 'neighbourhood:N', alt.value('lightgray')),
-        tooltip=['neighbourhood', 'count()']
-    )
+    x=alt.X('neighbourhood:N',
+            sort='-y',
+            axis=alt.Axis(title='Neighborhood', labelAngle=-30, labelPadding=10)),
+    y=alt.Y('count():Q',
+            axis=alt.Axis(title='Number of Listings')),
+    color=alt.condition(neigh_select, 'neighbourhood:N', alt.value('lightgray')),
+    tooltip=['neighbourhood', 'count()']
+)
     .add_selection(neigh_select)
     .properties(width=700, height=300, title="Number of Listings by Neighborhood")
 )
@@ -60,12 +63,14 @@ bar_chart = (
 scatter = (
     alt.Chart(filtered)
     .mark_circle(size=120, opacity=0.6)
-    .encode(
-        x='number_of_reviews:Q',
-        y='price:Q',
-        color='room_type:N',
-        tooltip=['name', 'neighbourhood', 'price', 'number_of_reviews']
-    )
+   .encode(
+    y=alt.Y('neighbourhood:N',
+            axis=alt.Axis(title='Neighborhood', labelPadding=10)),
+    x=alt.X('price:Q',
+            axis=alt.Axis(title='Price (USD)', format='$,.0f', labelPadding=10)),
+    color='neighbourhood:N',
+    tooltip=['neighbourhood', 'price']
+)
     .transform_filter(neigh_select)
     .properties(width=700, height=400, title="Price vs Number of Reviews")
 )
@@ -84,12 +89,15 @@ st.altair_chart(bar_scatter, use_container_width=True)
 boxplot = (
     alt.Chart(filtered)
     .mark_boxplot(size=60)
-    .encode(
-        y='neighbourhood:N',
-        x='price:Q',
-        color='neighbourhood:N',
-        tooltip=['neighbourhood', 'price']
-    )
+   .encode(
+    x=alt.X('number_of_reviews:Q',
+            axis=alt.Axis(title='Number of Reviews', labelPadding=10),
+            scale=alt.Scale(padding=20)),
+    y=alt.Y('price:Q',
+            axis=alt.Axis(title='Price (USD)', format='$,.0f', labelPadding=10)),
+    color='room_type:N',
+    tooltip=['name', 'neighbourhood', 'price', 'number_of_reviews']
+)
     .properties(width=700, height=500, title="Price Distribution by Neighborhood")
 )
 
