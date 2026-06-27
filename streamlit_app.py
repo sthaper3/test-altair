@@ -52,7 +52,12 @@ scatter = (
     alt.Chart(df)
     .mark_circle(size=120, opacity=0.6)
     .encode(
-        x='number_of_reviews:Q',
+        x=alt.X(
+            'number_of_reviews:Q',
+            scale=alt.Scale(
+                domain=[0, df['number_of_reviews'].quantile(0.95)]
+            )
+        ),
         y='price:Q',
         color='room_type:N',
         tooltip=['name', 'neighbourhood', 'price', 'number_of_reviews']
@@ -60,7 +65,5 @@ scatter = (
     .properties(width=900, height=600, title="Price vs Number of Reviews")
 )
 
-st.subheader("Price vs Number of Reviews")
-st.altair_chart(scatter, use_container_width=True)
 
 
