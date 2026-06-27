@@ -6,6 +6,7 @@ st.title("Airbnb Listings in Newark, NJ")
 
 df = pd.read_csv("listings.csv")
 
+# Clean price
 df['price'] = df['price'].replace('[\$,]', '', regex=True).astype(float)
 
 # Sidebar filters
@@ -24,9 +25,9 @@ if selected_room != "All":
 
 filtered = filtered[(filtered['price'] >= price_range[0]) & (filtered['price'] <= price_range[1])]
 
-# Selections (v4-compatible)
-map_select = alt.selection_point(fields=['neighbourhood'], empty='all')
-box_select = alt.selection_point(fields=['neighbourhood'], empty='all')
+# Selections (Altair v4)
+map_select = alt.selection_single(fields=['neighbourhood'], empty='none')
+box_select = alt.selection_single(fields=['neighbourhood'], empty='none')
 
 # ---------------------------
 # MAP
@@ -51,6 +52,7 @@ st.altair_chart(map_chart, use_container_width=True)
 # ---------------------------
 # BOXPLOT
 # ---------------------------
+# Only filter by map selection IF a selection exists
 boxplot = (
     alt.Chart(filtered)
     .mark_boxplot()
@@ -62,7 +64,7 @@ boxplot = (
         tooltip=['neighbourhood', 'price']
     )
     .add_selection(box_select)
-    .transform_filter(map_select)
+    .transform_filter(map_select)  # safe because empty='none'
     .properties(width=700, height=400, title="Price Distribution by Neighborhood")
 )
 
@@ -89,3 +91,4 @@ scatter = (
 
 st.subheader("Price vs Number of Reviews")
 st.altair_chart(scatter, use_container_width=True)
+
