@@ -10,25 +10,25 @@ df = pd.read_csv("listings.csv")
 df['price'] = df['price'].replace('[\$,]', '', regex=True).astype(float)
 
 # ---------------------------
-# 1. MAP
+# 1. BAR CHART — Listings per Neighborhood
 # ---------------------------
-map_chart = (
+bar_chart = (
     alt.Chart(df)
-    .mark_circle(size=40, opacity=0.5)
+    .mark_bar()
     .encode(
-        longitude='longitude:Q',
-        latitude='latitude:Q',
-        color=alt.Color('price:Q', scale=alt.Scale(scheme='viridis')),
-        tooltip=['name', 'neighbourhood', 'price', 'room_type']
+        x='neighbourhood:N',
+        y='count():Q',
+        color='neighbourhood:N',
+        tooltip=['neighbourhood', 'count()']
     )
-    .properties(width=700, height=400, title="Map of Listings")
+    .properties(width=700, height=400, title="Number of Listings by Neighborhood")
 )
 
-st.subheader("Map of Listings")
-st.altair_chart(map_chart, use_container_width=True)
+st.subheader("Listings by Neighborhood")
+st.altair_chart(bar_chart, use_container_width=True)
 
 # ---------------------------
-# 2. BOXPLOT
+# 2. BOXPLOT — Price Distribution by Neighborhood
 # ---------------------------
 boxplot = (
     alt.Chart(df)
@@ -46,7 +46,7 @@ st.subheader("Price Distribution by Neighborhood")
 st.altair_chart(boxplot, use_container_width=True)
 
 # ---------------------------
-# 3. SCATTERPLOT
+# 3. SCATTERPLOT — Price vs Number of Reviews
 # ---------------------------
 scatter = (
     alt.Chart(df)
@@ -62,5 +62,4 @@ scatter = (
 
 st.subheader("Price vs Number of Reviews")
 st.altair_chart(scatter, use_container_width=True)
-
 
