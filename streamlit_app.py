@@ -7,40 +7,43 @@ st.title("Inside Airbnb: Interactive Dashboard")
 # Load data
 df = pd.read_csv("listings.csv")
 
+# Normalize neighborhood names (important for filtering)
+df['neighbourhood'] = df['neighbourhood'].astype(str).str.strip()
+
 # -----------------------------
-# SIDEBAR FILTERS
+# SIDEBAR FILTERS (for price scatterplot)
 # -----------------------------
 st.sidebar.header("Filters")
 
-# Neighborhood dropdown (filters scatterplot only)
+# Neighborhood dropdown
 neighs = sorted(df['neighbourhood'].dropna().unique())
-selected_neigh = st.sidebar.selectbox("Filter Scatterplot by Neighborhood", ["All"] + neighs)
+selected_neigh = st.sidebar.selectbox("Filter Price Scatterplot by Neighborhood", ["All"] + neighs)
 
-# Price slider (filters scatterplot only)
+# Price slider
 min_price = int(df['price'].min())
 max_price = int(df['price'].max())
-price_range = st.sidebar.slider("Price Range (Scatterplot)", min_price, max_price, (min_price, 850))
+price_range = st.sidebar.slider("Price Range", min_price, max_price, (min_price, 850))
 
-# Apply filters to scatterplot
-scatter_df = df.copy()
+# Apply filters to price scatterplot
+price_scatter_df = df.copy()
 
 if selected_neigh != "All":
-    scatter_df = scatter_df[scatter_df['neighbourhood'] == selected_neigh]
+    price_scatter_df = price_scatter_df[price_scatter_df['neighbourhood'] == selected_neigh]
 
-scatter_df = scatter_df[
-    (scatter_df['price'] >= price_range[0]) &
-    (scatter_df['price'] <= price_range[1])
+price_scatter_df = price_scatter_df[
+    (price_scatter_df['price'] >= price_range[0]) &
+    (price_scatter_df['price'] <= price_range[1])
 ]
 
 # -----------------------------
-# SELECTION FOR BAR → BOXPLOT
+# SELECTION FOR BAR → AVAILABILITY SCATTER
 # -----------------------------
 bar_select = alt.selection_single(fields=['neighbourhood'], empty='all')
 
 # -----------------------------
 # 1. BAR CHART: Listings by Neighborhood
 # -----------------------------
-st.header("Listings by Neighborhood (Click a Bar to Filter Boxplot)")
+st.header("Listings by Neighborhood (Click a Bar to Filter Availability Scatterplot)")
 
 bar_chart = (
     alt.Chart(df)
@@ -58,32 +61,32 @@ bar_chart = (
 st.altair_chart(bar_chart, use_container_width=True)
 
 # -----------------------------
-# 2. BOXPLOT: Price Distribution for Selected Neighborhood
+# 2. AVAILABILITY vs REVIEWS (Filtered by Bar Click)
 # -----------------------------
-st.header("Price Distribution (Neighborhood Selected from Bar Chart)")
+st.header("Availability vs Number of Reviews (Neighborhood Selected from Bar Chart)")
 
-boxplot = (
+availability_scatter = (
     alt.Chart(df)
-    .mark_boxplot()
+    .mark_circle(size=60, opacity=0.6)
     .encode(
-        x=alt.X("neighbourhood:N", title="Neighborhood"),
-        y=alt.Y("price:Q", title="Price"),
+        x=alt.X("availability_365:Q", title="Availability (Days per Year)"),
+        y=alt.Y("number_of_reviews:Q", title="Number of Reviews"),
         color="neighbourhood:N",
-        tooltip=["neighbourhood", "price"]
+        tooltip=["neighbourhood", "availability_365", "number_of_reviews"]
     )
     .transform_filter(bar_select)
     .properties(height=300)
 )
 
-st.altair_chart(boxplot, use_container_width=True)
+st.altair_chart(availability_scatter, use_container_width=True)
 
 # -----------------------------
-# 3. SCATTERPLOT: Price vs Number of Reviews
+# 3. PRICE vs REVIEWS (Filtered by Dropdown + Slider)
 # -----------------------------
-st.header("Price vs. Number of Reviews (Filtered by Dropdown + Slider)")
+st.header("Price vs Number of Reviews (Filtered by Dropdown + Slider)")
 
-scatter = (
-    alt.Chart(scatter_df)
+price_scatter = (
+    alt.Chart(price_scatter_df)
     .mark_circle(size=60, opacity=0.6)
     .encode(
         x=alt.X("price:Q", title="Price"),
@@ -94,7 +97,8 @@ scatter = (
     .properties(height=300)
 )
 
-st.altair_chart(scatter, use_container_width=True)
+st.altair_chart(price_scatter, use_container_width=True)
+
 
 
 
