@@ -60,6 +60,9 @@ scatter = (
     .properties(width=900, height=600, title="Price vs Number of Reviews")
 )
 
+st.subheader("Price vs Number of Reviews")
+st.altair_chart(scatter, use_container_width=True)
+
 
 
 
