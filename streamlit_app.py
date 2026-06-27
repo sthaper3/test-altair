@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 
-st.title("AirBnb Listings in Newark, NJ")
+st.title("Basic Newark Airbnb Dashboard (With Filters + Bar→Scatter Interaction)")
 
 df = pd.read_csv("listings.csv")
 
@@ -45,9 +45,8 @@ bar_chart = (
     alt.Chart(filtered)
     .mark_bar()
     .encode(
-    x=alt.X('neighbourhood:N',
-            sort='-y',
-            axis=alt.Axis(title='Neighborhood', labelAngle=-30, labelPadding=10)),
+    x=alt.X('neighbourhood:N', sort='-y',
+            axis=alt.Axis(title='Neighborhood')),
     y=alt.Y('count():Q',
             axis=alt.Axis(title='Number of Listings')),
     color=alt.condition(neigh_select, 'neighbourhood:N', alt.value('lightgray')),
@@ -63,14 +62,15 @@ bar_chart = (
 scatter = (
     alt.Chart(filtered)
     .mark_circle(size=120, opacity=0.6)
-   .encode(
-    y=alt.Y('neighbourhood:N',
-            axis=alt.Axis(title='Neighborhood', labelPadding=10)),
-    x=alt.X('price:Q',
-            axis=alt.Axis(title='Price (USD)', format='$,.0f', labelPadding=10)),
-    color='neighbourhood:N',
-    tooltip=['neighbourhood', 'price']
+    .encode(
+    x=alt.X('number_of_reviews:Q',
+            axis=alt.Axis(title='Number of Reviews')),
+    y=alt.Y('price:Q',
+            axis=alt.Axis(title='Price')),
+    color='room_type:N',
+    tooltip=['name', 'neighbourhood', 'price', 'number_of_reviews']
 )
+
     .transform_filter(neigh_select)
     .properties(width=700, height=400, title="Price vs Number of Reviews")
 )
@@ -89,20 +89,21 @@ st.altair_chart(bar_scatter, use_container_width=True)
 boxplot = (
     alt.Chart(filtered)
     .mark_boxplot(size=60)
-   .encode(
-    x=alt.X('number_of_reviews:Q',
-            axis=alt.Axis(title='Number of Reviews', labelPadding=10),
-            scale=alt.Scale(padding=20)),
-    y=alt.Y('price:Q',
-            axis=alt.Axis(title='Price (USD)', format='$,.0f', labelPadding=10)),
-    color='room_type:N',
-    tooltip=['name', 'neighbourhood', 'price', 'number_of_reviews']
+    .encode(
+    y=alt.Y('neighbourhood:N',
+            axis=alt.Axis(title='Neighborhood')),
+    x=alt.X('price:Q',
+            axis=alt.Axis(title='Price')),
+    color='neighbourhood:N',
+    tooltip=['neighbourhood', 'price']
 )
+
     .properties(width=700, height=500, title="Price Distribution by Neighborhood")
 )
 
 st.subheader("Price Distribution by Neighborhood")
 st.altair_chart(boxplot, use_container_width=True)
+
 
 
 
