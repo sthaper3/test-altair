@@ -15,8 +15,8 @@ df = pd.read_csv("listings.csv")
 st.sidebar.header("Filters")
 
 # Neighborhood dropdown
-neighborhoods = sorted(df['neighborhood'].dropna().unique())
-selected_neigh = st.sidebar.selectbox("Neighborhood", ["All"] + neighborhoods)
+neighbourhoods = sorted(df['neighbourhood'].dropna().unique())
+selected_neigh = st.sidebar.selectbox("Neighbourhood", ["All"] + neighbourhoods)
 
 # Price slider
 min_price = int(df['price'].min())
@@ -44,7 +44,7 @@ filtered = filtered[
 # -----------------------------
 # LINKED SELECTION (BRUSH)
 # -----------------------------
-brush = alt.selection_interval(encodings=['x', 'y'])
+brush = alt.selection_interval(encodings=['x', 'y'], empty='all')
 
 # -----------------------------
 # 1. BAR CHART: Listings by Neighborhood
@@ -68,7 +68,6 @@ st.altair_chart(bar_chart, use_container_width=True)
 # 2. BOXPLOT: Price Distribution Across Neighborhoods
 # -----------------------------
 
-brush = alt.selection_interval(encodings=['x', 'y'], empty='all')
 st.header("Price Distribution Across Neighborhoods")
 
 boxplot = (
