@@ -2,76 +2,68 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 
-st.title("Interactive Dashboard For Airbnb Listings in Newark, NJ")
+st.title("Inside Airbnb: Interactive Dashboard")
 
-# -----------------------------
-# LOAD DATA
-# -----------------------------
-df = pd.read_csv("listings.csv")   
+# Load data
+df = pd.read_csv("listings.csv")
 
 # -----------------------------
 # SIDEBAR FILTERS
 # -----------------------------
 st.sidebar.header("Filters")
 
-# Neighborhood dropdown
-neighbourhoods = sorted(df['neighbourhood'].dropna().unique())
-selected_neigh = st.sidebar.selectbox("Neighbourhood", ["All"] + neighbourhoods)
+# Neighborhood dropdown (filters scatterplot only)
+neighs = sorted(df['neighbourhood'].dropna().unique())
+selected_neigh = st.sidebar.selectbox("Filter Scatterplot by Neighborhood", ["All"] + neighs)
 
-# Price slider
+# Price slider (filters scatterplot only)
 min_price = int(df['price'].min())
 max_price = int(df['price'].max())
-price_range = st.sidebar.slider("Price Range", min_price, max_price, (min_price, 850))
+price_range = st.sidebar.slider("Price Range (Scatterplot)", min_price, max_price, (min_price, 850))
 
-# Review slider
-min_reviews = int(df['number_of_reviews'].min())
-max_reviews = int(df['number_of_reviews'].max())
-review_range = st.sidebar.slider("Number of Reviews", min_reviews, max_reviews, (0, 500))
-
-# Apply filters
-filtered = df.copy()
+# Apply filters to scatterplot
+scatter_df = df.copy()
 
 if selected_neigh != "All":
-    filtered = filtered[filtered['neighbourhood'] == selected_neigh]
+    scatter_df = scatter_df[scatter_df['neighbourhood'] == selected_neigh]
 
-filtered = filtered[
-    (filtered['price'] >= price_range[0]) &
-    (filtered['price'] <= price_range[1]) &
-    (filtered['number_of_reviews'] >= review_range[0]) &
-    (filtered['number_of_reviews'] <= review_range[1])
+scatter_df = scatter_df[
+    (scatter_df['price'] >= price_range[0]) &
+    (scatter_df['price'] <= price_range[1])
 ]
 
 # -----------------------------
-# LINKED SELECTION (BRUSH)
+# SELECTION FOR BAR → BOXPLOT
 # -----------------------------
-brush = alt.selection_interval(encodings=['x', 'y'], empty='all')
+bar_select = alt.selection_single(fields=['neighbourhood'], empty='none')
 
 # -----------------------------
 # 1. BAR CHART: Listings by Neighborhood
 # -----------------------------
-st.header("Number of Listings by Neighborhood")
+st.header("Listings by Neighborhood (Click a Bar to Filter Boxplot)")
 
 bar_chart = (
-    alt.Chart(filtered)
+    alt.Chart(df)
     .mark_bar()
     .encode(
         x=alt.X("neighbourhood:N", sort="-y", title="Neighborhood"),
         y=alt.Y("count():Q", title="Number of Listings"),
-        tooltip=["neighbourhood", "count()"]
+        tooltip=["neighbourhood", "count()"],
+        color=alt.condition(bar_select, alt.value("steelblue"), alt.value("lightgray"))
     )
+    .add_params(bar_select)
     .properties(height=300)
 )
 
 st.altair_chart(bar_chart, use_container_width=True)
 
 # -----------------------------
-# 2. BOXPLOT: Price Distribution Across Neighborhoods
+# 2. BOXPLOT: Price Distribution for Selected Neighborhood
 # -----------------------------
-
-st.header("Price Distribution Across Neighborhoods")
+st.header("Price Distribution (Neighborhood Selected from Bar Chart)")
 
 boxplot = (
-    alt.Chart(filtered)
+    alt.Chart(df)
     .mark_boxplot()
     .encode(
         x=alt.X("neighbourhood:N", title="Neighborhood"),
@@ -79,19 +71,19 @@ boxplot = (
         color="neighbourhood:N",
         tooltip=["neighbourhood", "price"]
     )
-    .transform_filter(brush)
+    .transform_filter(bar_select)
     .properties(height=300)
 )
 
 st.altair_chart(boxplot, use_container_width=True)
 
 # -----------------------------
-# 3. SCATTERPLOT: Price vs Number of Reviews (BRUSHABLE)
+# 3. SCATTERPLOT: Price vs Number of Reviews
 # -----------------------------
-st.header("Price vs. Number of Reviews")
+st.header("Price vs. Number of Reviews (Filtered by Dropdown + Slider)")
 
 scatter = (
-    alt.Chart(filtered)
+    alt.Chart(scatter_df)
     .mark_circle(size=60, opacity=0.6)
     .encode(
         x=alt.X("price:Q", title="Price"),
@@ -99,11 +91,11 @@ scatter = (
         color="neighbourhood:N",
         tooltip=["neighbourhood", "price", "number_of_reviews"]
     )
-    .add_params(brush)
     .properties(height=300)
 )
 
 st.altair_chart(scatter, use_container_width=True)
+
 
 
 
