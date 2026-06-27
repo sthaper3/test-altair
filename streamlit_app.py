@@ -8,7 +8,7 @@ st.title("Interactive University Donations Dashboard")
 # -------------------------
 # Load data
 # -------------------------
-df = pd.read_csv("airbnb.csv")
+df = pd.read_csv("university-donations.csv")
 
 # -------------------------
 # Sidebar Filters
@@ -100,8 +100,6 @@ college_chart = (
 linked_view = alt.vconcat(subcategory_chart, college_chart).resolve_scale(color='independent')
 
 st.altair_chart(linked_view, use_container_width=True)
-
-streamlit run streamlit_app.py
 
 
 
