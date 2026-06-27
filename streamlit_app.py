@@ -34,7 +34,7 @@ filtered = filtered[
 ]
 
 # ---------------------------
-# INTERACTIVITY: selection shared across bar + scatter
+# INTERACTIVITY: Click a bar → filter scatterplot
 # ---------------------------
 neigh_select = alt.selection_single(fields=['neighbourhood'], empty='all')
 
@@ -45,16 +45,12 @@ bar_chart = (
     alt.Chart(filtered)
     .mark_bar()
     .encode(
-        x=alt.X('neighbourhood:N', sort='-y',
+        x=alt.X('neighbourhood:N',
+                sort='-y',
                 axis=alt.Axis(title='Neighborhood')),
         y=alt.Y('count():Q',
                 axis=alt.Axis(title='Number of Listings')),
-        color=alt.condition(
-    neigh_select,
-    alt.Color('neighbourhood:N', scale=alt.Scale(scheme='tableau20')),
-    alt.value('lightgray')
-)
-
+        color=alt.condition(neigh_select, 'neighbourhood:N', alt.value('lightgray')),
         tooltip=['neighbourhood', 'count()']
     )
     .add_selection(neigh_select)
@@ -68,14 +64,13 @@ scatter = (
     alt.Chart(filtered)
     .mark_circle(size=120, opacity=0.6)
     .encode(
-    x=alt.X('number_of_reviews:Q',
-            axis=alt.Axis(title='Number of Reviews')),
-    y=alt.Y('price:Q',
-            axis=alt.Axis(title='Price')),
-    color='room_type:N',
-    tooltip=['name', 'neighbourhood', 'price', 'number_of_reviews']
-)
-
+        x=alt.X('number_of_reviews:Q',
+                axis=alt.Axis(title='Number of Reviews')),
+        y=alt.Y('price:Q',
+                axis=alt.Axis(title='Price')),
+        color='neighbourhood:N',
+        tooltip=['name', 'room_type', 'price', 'number_of_reviews']
+    )
     .transform_filter(neigh_select)
     .properties(width=700, height=400, title="Price vs Number of Reviews")
 )
@@ -89,20 +84,19 @@ st.subheader("Listings and Reviews by Neighborhood")
 st.altair_chart(bar_scatter, use_container_width=True)
 
 # ---------------------------
-# 3. BOXPLOT — Price Distribution by Neighborhood (independent)
+# 3. BOXPLOT — Price Distribution by Neighborhood
 # ---------------------------
 boxplot = (
     alt.Chart(filtered)
     .mark_boxplot(size=60)
     .encode(
-    y=alt.Y('neighbourhood:N',
-            axis=alt.Axis(title='Neighborhood')),
-    x=alt.X('price:Q',
-            axis=alt.Axis(title='Price')),
-    color='neighbourhood:N',
-    tooltip=['neighbourhood', 'price']
-)
-
+        y=alt.Y('neighbourhood:N',
+                axis=alt.Axis(title='Neighborhood')),
+        x=alt.X('price:Q',
+                axis=alt.Axis(title='Price')),
+        color='neighbourhood:N',
+        tooltip=['neighbourhood', 'price']
+    )
     .properties(width=700, height=500, title="Price Distribution by Neighborhood")
 )
 
