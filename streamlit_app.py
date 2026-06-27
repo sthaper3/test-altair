@@ -15,7 +15,7 @@ df = pd.read_csv("listings.csv")
 st.sidebar.header("Filters")
 
 # Neighborhood dropdown
-neighborhoods = sorted(df['neighbourhood'].dropna().unique())
+neighborhoods = sorted(df['neighborhood'].dropna().unique())
 selected_neigh = st.sidebar.selectbox("Neighborhood", ["All"] + neighborhoods)
 
 # Price slider
@@ -67,6 +67,8 @@ st.altair_chart(bar_chart, use_container_width=True)
 # -----------------------------
 # 2. BOXPLOT: Price Distribution Across Neighborhoods
 # -----------------------------
+
+brush = alt.selection_interval(encodings=['x', 'y'], empty='all')
 st.header("Price Distribution Across Neighborhoods")
 
 boxplot = (
