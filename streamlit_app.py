@@ -38,7 +38,7 @@ price_scatter_df = price_scatter_df[
 # -----------------------------
 # SELECTION FOR BAR → AVAILABILITY SCATTER
 # -----------------------------
-bar_select = alt.selection_single(fields=['neighbourhood'], empty='all')
+bar_select = alt.selection_point(fields=['neighbourhood'], empty='all')
 
 # -----------------------------
 # 1. BAR CHART: Listings by Neighborhood
