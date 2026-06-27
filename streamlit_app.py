@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 
-st.title("Basic Newark Airbnb Dashboard (With Filters)")
+st.title("Basic Newark Airbnb Dashboard (With Filters + Interaction)")
 
 df = pd.read_csv("listings.csv")
 
@@ -34,6 +34,11 @@ filtered = filtered[
 ]
 
 # ---------------------------
+# INTERACTIVITY: Click a bar → filter scatterplot
+# ---------------------------
+neigh_select = alt.selection_single(fields=['neighbourhood'], empty='all')
+
+# ---------------------------
 # 1. BAR CHART — Listings per Neighborhood
 # ---------------------------
 bar_chart = (
@@ -42,9 +47,10 @@ bar_chart = (
     .encode(
         x=alt.X('neighbourhood:N', sort='-y'),
         y='count():Q',
-        color='neighbourhood:N',
+        color=alt.condition(neigh_select, 'neighbourhood:N', alt.value('lightgray')),
         tooltip=['neighbourhood', 'count()']
     )
+    .add_selection(neigh_select)
     .properties(width=700, height=400, title="Number of Listings by Neighborhood")
 )
 
@@ -81,12 +87,12 @@ scatter = (
         color='room_type:N',
         tooltip=['name', 'neighbourhood', 'price', 'number_of_reviews']
     )
+    .transform_filter(neigh_select)   # <-- CLICK BAR FILTERS SCATTERPLOT
     .properties(width=900, height=600, title="Price vs Number of Reviews")
 )
 
 st.subheader("Price vs Number of Reviews")
 st.altair_chart(scatter, use_container_width=True)
-
 
 
 
